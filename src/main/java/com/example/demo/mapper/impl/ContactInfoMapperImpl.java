@@ -18,7 +18,7 @@ public class ContactInfoMapperImpl implements ContactInfoMapper {
 		try {
             return  contactModelDao.retrieveList("retrieveListContactInfo", new ContactModel());
         } catch (Exception e) {
-            throw new Exception("Error retrieving for update AboutUs", e);
+            throw new Exception("Error retrieving Contact Info", e);
         }
 	}
 
@@ -27,7 +27,7 @@ public class ContactInfoMapperImpl implements ContactInfoMapper {
         try {
             return  contactModelDao.register("registerContactInfo", param);
         } catch (Exception e) {
-            throw new Exception("Error retrieving for update AboutUs", e);
+            throw new Exception("Error retrieving Contact Info", e);
         }
     }
 
