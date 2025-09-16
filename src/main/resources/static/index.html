@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .contact-card {
+            transition: transform 0.2s;
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+        }
+        .loading {
+            display: none;
+        }
+        .error-message {
+            display: none;
+        }
+        .success-message {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-address-book me-2"></i>Contact Management
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2><i class="fas fa-users me-2"></i>Contact List</h2>
+                <p class="text-muted">Manage your contact information</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addContactModal">
+                    <i class="fas fa-plus me-2"></i>Add New Contact
+                </button>
+                <button class="btn btn-primary" onclick="loadContacts()">
+                    <i class="fas fa-refresh me-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div class="alert alert-success success-message" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span id="successText"></span>
+        </div>
+        <div class="alert alert-danger error-message" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="text-center loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading contacts...</p>
+        </div>
+
+        <!-- Contact Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered" id="contactTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Contact Person</th>
+                        <th>Address</th>
+                        <th>Telephone</th>
+                        <th>Email</th>
+                        <th>City</th>
+                        <th>Province</th>
+                        <th>Created Date</th>
+                    </tr>
+                </thead>
+                <tbody id="contactTableBody">
+                    <!-- Contact rows will be dynamically loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- No Data Message -->
+        <div class="text-center mt-5" id="noDataMessage" style="display: none;">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No contacts found</h4>
+            <p class="text-muted">Click "Add New Contact" to get started</p>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Add New Contact
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="contactForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="address" class="form-label">Address *</label>
+                                <input type="text" class="form-control" id="address" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="province" class="form-label">Province *</label>
+                                <select class="form-control" id="province" required onchange="updateDistricts()">
+                                    <option value="">Select Province</option>
+                                    <option value="Phnom Penh">Phnom Penh</option>
+                                    <option value="Takeo">Takeo</option>
+                                    <option value="Kandal">Kandal</option>
+                                    <option value="Kampong Speu">Kampong Speu</option>
+                                    <option value="Kampong Chhnang">Kampong Chhnang</option>
+                                    <option value="Kampong Thom">Kampong Thom</option>
+                                    <option value="Siem Reap">Siem Reap</option>
+                                    <option value="Banteay Meanchey">Banteay Meanchey</option>
+                                    <option value="Battambang">Battambang</option>
+                                    <option value="Pursat">Pursat</option>
+                                    <option value="Kampong Cham">Kampong Cham</option>
+                                    <option value="Tbong Khmum">Tbong Khmum</option>
+                                    <option value="Kratie">Kratie</option>
+                                    <option value="Mondulkiri">Mondulkiri</option>
+                                    <option value="Ratanakiri">Ratanakiri</option>
+                                    <option value="Stung Treng">Stung Treng</option>
+                                    <option value="Preah Vihear">Preah Vihear</option>
+                                    <option value="Oddar Meanchey">Oddar Meanchey</option>
+                                    <option value="Preah Sihanouk">Preah Sihanouk</option>
+                                    <option value="Kampot">Kampot</option>
+                                    <option value="Kep">Kep</option>
+                                    <option value="Koh Kong">Koh Kong</option>
+                                    <option value="Pailin">Pailin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="district" class="form-label">District *</label>
+                                <select class="form-control" id="district" required onchange="updateAmphurs()">
+                                    <option value="">Select District</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="amphur" class="form-label">Amphur *</label>
+                                <select class="form-control" id="amphur" required>
+                                    <option value="">Select Amphur</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="postalCode" class="form-label">Postal Code *</label>
+                                <input type="text" class="form-control" id="postalCode" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="telephone" class="form-label">Telephone *</label>
+                                <input type="tel" class="form-control" id="telephone" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fax" class="form-label">Fax</label>
+                                <input type="text" class="form-control" id="fax">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City *</label>
+                                <input type="text" class="form-control" id="city" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contactPerson" class="form-label">Contact Person *</label>
+                                <input type="text" class="form-control" id="contactPerson" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="createdBy" class="form-label">Created By *</label>
+                            <input type="text" class="form-control" id="createdBy" value="WEB_USER" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api';
+        
+        // Cambodia data - simplified
+        const cambodiaData = {
+            "Phnom Penh": { districts: ["Chamkar Mon", "Daun Penh", "Prampi Makara", "Tuol Kork", "Dangkao", "Mean Chey", "Russey Keo", "Sen Sok"], amphurs: { "Chamkar Mon": ["Tonle Bassac", "Boeung Keng Kang I", "Boeung Keng Kang II"], "Daun Penh": ["Phsar Thmei I", "Phsar Thmei II", "Phsar Thmei III"], "Prampi Makara": ["Veal Vong", "7 Makara", "Boeung Prolit"] } },
+            "Takeo": { districts: ["Doun Kaev", "Kirivong", "Prey Kabbas", "Samraong", "S'ang", "Takeo"], amphurs: { "Doun Kaev": ["Doun Kaev", "Prey Kabbas", "Angkor Borei"], "Kirivong": ["Kirivong", "Koh Andet", "Prey Kabbas"], "Takeo": ["Takeo", "Angkor Borei", "Bati"] } },
+            "Kandal": { districts: ["Kandal Stueng", "Kien Svay", "Khsach Kandal", "Koh Thom", "Leuk Daek", "Mukh Kampul"], amphurs: { "Kandal Stueng": ["Kandal Stueng", "Angk Snuol", "Ponhea Lueu"], "Kien Svay": ["Kien Svay", "Sa'ang", "Takhmao"], "Koh Thom": ["Koh Thom", "Leuk Daek", "Sa'ang"] } },
+            "Siem Reap": { districts: ["Angkor Chum", "Angkor Thum", "Banteay Srei", "Chi Kraeng", "Kralanh", "Puok"], amphurs: { "Angkor Chum": ["Angkor Chum", "Angkor Thum", "Banteay Srei"], "Angkor Thum": ["Angkor Thum", "Chi Kraeng", "Kralanh"], "Siem Reap": ["Siem Reap", "Soutr Nikom", "Srei Snam"] } }
+        };
+        
+        // Load contacts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadContacts();
+        });
+
+        // Update dropdowns
+        function updateDistricts() {
+            const province = document.getElementById('province').value;
+            const districtSelect = document.getElementById('district');
+            const amphurSelect = document.getElementById('amphur');
+            
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            amphurSelect.innerHTML = '<option value="">Select Amphur</option>';
+            
+            if (province && cambodiaData[province]) {
+                cambodiaData[province].districts.forEach(district => {
+                    districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
+                });
+            }
+        }
+
+        function updateAmphurs() {
+            const province = document.getElementById('province').value;
+            const district = document.getElementById('district').value;
+            const amphurSelect = document.getElementById('amphur');
+            
+            amphurSelect.innerHTML = '<option value="">Select Amphur</option>';
+            
+            if (province && district && cambodiaData[province]?.amphurs[district]) {
+                cambodiaData[province].amphurs[district].forEach(amphur => {
+                    amphurSelect.innerHTML += `<option value="${amphur}">${amphur}</option>`;
+                });
+            }
+        }
+
+        // Load all contacts
+        async function loadContacts() {
+            showLoading(true);
+            hideMessages();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/contact-list`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayContacts(data);
+                } else {
+                    showError('Failed to load contacts: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display contacts in table
+        function displayContacts(contacts) {
+            const contactTableBody = document.getElementById('contactTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            
+            if (!contacts || contacts.length === 0) {
+                contactTableBody.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            
+            noDataMessage.style.display = 'none';
+            
+            contactTableBody.innerHTML = contacts.map(contact => `
+                <tr>
+                    <td>${contact.contactID || 'N/A'}</td>
+                    <td>${contact.contactPerson || 'N/A'}</td>
+                    <td>${contact.address || 'N/A'}</td>
+                    <td>${contact.telephone || 'N/A'}</td>
+                    <td>${contact.email || 'N/A'}</td>
+                    <td>${contact.city || 'N/A'}</td>
+                    <td>${contact.province || 'N/A'}</td>
+                    <td>${formatDate(contact.createdDate)}</td>
+                </tr>
+            `).join('');
+        }
+
+
+        // Handle form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                address: document.getElementById('address').value,
+                district: document.getElementById('district').value,
+                amphur: document.getElementById('amphur').value,
+                province: document.getElementById('province').value,
+                postalCode: document.getElementById('postalCode').value,
+                telephone: document.getElementById('telephone').value,
+                fax: document.getElementById('fax').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                country: document.getElementById('country').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                email: document.getElementById('email').value,
+                createdBy: document.getElementById('createdBy').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/contact-register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('Contact added successfully!');
+                    document.getElementById('contactForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('addContactModal')).hide();
+                    loadContacts();
+                } else {
+                    showError('Failed to add contact: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+        });
+
+        // Utility functions
+        function showLoading(show) {
+            document.querySelector('.loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showSuccess(message) {
+            document.getElementById('successText').textContent = message;
+            document.querySelector('.success-message').style.display = 'block';
+            setTimeout(() => document.querySelector('.success-message').style.display = 'none', 5000);
+        }
+
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.querySelector('.error-message').style.display = 'block';
+            setTimeout(() => document.querySelector('.error-message').style.display = 'none', 5000);
+        }
+
+        function hideMessages() {
+            document.querySelector('.success-message').style.display = 'none';
+            document.querySelector('.error-message').style.display = 'none';
+        }
+
+        function formatDate(dateString) {
+            return dateString ? new Date(dateString).toLocaleDateString() : 'N/A';
+        }
+    </script>
+</body>
+</html>

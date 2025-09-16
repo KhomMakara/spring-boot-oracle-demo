@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.ContactInfoMapper">
+
+    <resultMap id="ContactModelResultMap" type="com.example.demo.model.ContactModel"></resultMap>
+
+    <select id="retrieveListContactInfo" resultMap="ContactModelResultMap">
+        <![CDATA[
+        SELECT /* RetrieveListContactInfo */
+               CONTACT_ID                AS "contactId"
+             , ADDRESS                   AS "address"
+             , DISTRICT                  AS "district"
+             , AMPHUR                    AS "amphur"
+             , PROVINCE                  AS "province"
+             , POSTAL_CODE               AS "postalCode"
+             , TELEPHONE                 AS "telephone"
+             , FAX                       AS "fax"
+             , CITY                      AS "city"
+             , STATE                     AS "state"
+             , COUNTRY                   AS "country"
+             , CONTACT_PERSON            AS "contactPerson"
+             , EMAIL                     AS "email"
+             , CREATED_BY                AS "createdBy"
+             , CREATED_DATE              AS "createdDate"
+             , UPDATED_BY                AS "updatedBy"
+             , UPDATED_DATE              AS "updatedDate"
+          FROM CONTACT_INFO
+         ORDER BY CREATED_DATE DESC
+        ]]>
+    </select>
+
+    <insert id="registerContactInfo" parameterType="com.example.demo.model.ContactModel">
+        <![CDATA[
+        INSERT INTO CONTACT_INFO (
+            CONTACT_ID,
+            ADDRESS,
+            DISTRICT,
+            AMPHUR,
+            PROVINCE,
+            POSTAL_CODE,
+            TELEPHONE,
+            FAX,
+            CITY,
+            STATE,
+            COUNTRY,
+            CONTACT_PERSON,
+            EMAIL,
+            CREATED_BY,
+            CREATED_DATE
+        ) VALUES (
+            #{contactID},
+            #{address},
+            #{district},
+            #{amphur},
+            #{province},
+            #{postalCode},
+            #{telephone},
+            #{fax},
+            #{city},
+            #{state},
+            #{country},
+            #{contactPerson},
+            #{email},
+            #{createdBy},
+            CURRENT_TIMESTAMP
+        )
+        ]]>
+    </insert>
+
+</mapper>
