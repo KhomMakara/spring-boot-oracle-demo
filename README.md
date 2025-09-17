@@ -2,6 +2,7 @@
 
 A Spring Boot application demonstrating integration with Oracle Database using MyBatis and JPA.
 ### Application UI
+**App URL:** `http://localhost:8080`
 
 | Screenshot   | Preview                                                                 |
 |--------------|-------------------------------------------------------------------------|
