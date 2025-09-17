@@ -3,10 +3,13 @@
 A Spring Boot application demonstrating integration with Oracle Database using MyBatis and JPA.
 ### Application UI
 
-| Feature | Screenshot |
-|---------|------------|
-| Contact List | ![Contact List](docs/images/contact-list.png) |
-| Contact Form | ![Contact Form](docs/images/contact-register-form.png) |
+| Screenshot   | Preview                                                                 |
+|--------------|-------------------------------------------------------------------------|
+| Contact List | <img src="docs/images/contact-list.jpg" alt="Contact List" width="600"/> |
+| Contact Register | <img src="docs/images/contact-register-form.jpg" alt="Contact Form" width="600"/> |
+
+
+
 ## 🚀 Features
 
 - **Spring Boot 3.4.9** with Java 21
