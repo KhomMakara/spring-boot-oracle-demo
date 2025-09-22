@@ -17,12 +17,18 @@ import com.example.demo.model.ContactModel;
 import com.example.demo.model.ResultMessageModel;
 import com.example.demo.service.ContactServiceInfo;
 import com.example.demo.util.DateUtil;
+import com.example.demo.websocket.dto.ContactNotification;
+import com.example.demo.websocket.service.WebSocketService;
 
 @RestController
 @RequestMapping("/api")
 public class ContactController {
     @Autowired
     private ContactServiceInfo contactServiceInfo;
+    
+    @Autowired
+    private WebSocketService webSocketService;
+    
     private static final Logger log = LoggerFactory.getLogger(ContactController.class);
 
     @GetMapping("/contact-list")
@@ -41,6 +47,15 @@ public class ContactController {
 			if (contactServiceInfo.registerContactInfo(contactItem)) {
 				response.setResult("true");
 				response.setMessage("register Contact succefull");
+				
+				// Send WebSocket notification
+				ContactNotification notification = ContactNotification.createContactAdded(
+						contactItem.getContactID(),
+						contactItem.getContactPerson(),
+						contactItem.getCreatedBy()
+				);
+				webSocketService.sendContactNotification(notification);
+				
 			} else {
 				response.setResult("false");
 				response.setMessage("register Contact fail");

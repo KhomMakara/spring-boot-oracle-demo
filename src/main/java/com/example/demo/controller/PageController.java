@@ -10,4 +10,9 @@ public class PageController {
     public String index() {
         return "forward:/index.html";
     }
+    
+    @GetMapping("/websocket")
+    public String websocketTest() {
+        return "forward:/websocket-test.html";
+    }
 }
