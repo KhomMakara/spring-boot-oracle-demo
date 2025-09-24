@@ -16,6 +16,8 @@ import com.example.demo.exception.MRegisterErrException;
 import com.example.demo.model.ContactModel;
 import com.example.demo.model.ResultMessageModel;
 import com.example.demo.service.ContactServiceInfo;
+import com.example.demo.telegram.dto.ContactTelegramNotification;
+import com.example.demo.telegram.service.TelegramService;
 import com.example.demo.util.DateUtil;
 import com.example.demo.websocket.dto.ContactNotification;
 import com.example.demo.websocket.service.WebSocketService;
@@ -28,6 +30,9 @@ public class ContactController {
     
     @Autowired
     private WebSocketService webSocketService;
+    
+    @Autowired
+    private TelegramService telegramService;
     
     private static final Logger log = LoggerFactory.getLogger(ContactController.class);
 
@@ -55,6 +60,19 @@ public class ContactController {
 						contactItem.getCreatedBy()
 				);
 				webSocketService.sendContactNotification(notification);
+				
+				// Send Telegram notification
+				ContactTelegramNotification telegramNotification = ContactTelegramNotification.createContactAdded(
+						contactItem.getContactID(),
+						contactItem.getContactPerson(),
+						contactItem.getAddress(),
+						contactItem.getTelephone(),
+						contactItem.getEmail(),
+						contactItem.getProvince(),
+						contactItem.getCity(),
+						contactItem.getCreatedBy()
+				);
+				telegramService.sendContactNotification(telegramNotification);
 				
 			} else {
 				response.setResult("false");

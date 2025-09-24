@@ -89,6 +89,9 @@
                 <button class="btn btn-info" onclick="testWebSocketNotification()">
                     <i class="fas fa-bell me-2"></i>Test Notification
                 </button>
+                <button class="btn btn-warning" onclick="testTelegramNotification()">
+                    <i class="fab fa-telegram me-2"></i>Test Telegram
+                </button>
             </div>
         </div>
 
@@ -543,6 +546,45 @@
                 contactPerson: 'Test User',
                 timestamp: new Date().toISOString()
             });
+        }
+
+        async function testTelegramNotification() {
+            try {
+                showLoading(true);
+                
+                // Test Telegram connection first
+                const statusResponse = await fetch(`${API_BASE_URL}/telegram/status`);
+                const status = await statusResponse.json();
+                
+                if (!status.enabled) {
+                    showError('Telegram service is not configured. Please check your settings.');
+                    return;
+                }
+                
+                // Send test contact notification
+                const testResponse = await fetch(`${API_BASE_URL}/telegram/send-contact-test`, {
+                    method: 'POST'
+                });
+                
+                const result = await testResponse.json();
+                
+                if (result.success) {
+                    showSuccess('Telegram test notification sent successfully!');
+                    showWebSocketNotification({
+                        action: 'TELEGRAM_TEST',
+                        message: 'Telegram test notification sent!',
+                        contactPerson: 'System',
+                        timestamp: new Date().toISOString()
+                    });
+                } else {
+                    showError('Failed to send Telegram notification: ' + result.message);
+                }
+                
+            } catch (error) {
+                showError('Error testing Telegram: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
         }
     </script>
 </body>
