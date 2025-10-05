@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Oracle Database for Staging
+  oracle-db-staging:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: spring-oracle-db-staging
+    environment:
+      - ORACLE_PWD=staging_oracle123
+      - ORACLE_CHARACTERSET=AL32UTF8
+    ports:
+      - "1522:1521"
+      - "5501:5500"
+    volumes:
+      - oracle-staging-data:/opt/oracle/oradata
+    networks:
+      - spring-oracle-staging-network
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "system/staging_oracle123@//localhost:1521/XE", "@/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Spring Boot Application for Staging
+  spring-oracle-app-staging:
+    image: your-registry.com/spring-oracle:latest
+    container_name: spring-oracle-app-staging
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle-db-staging:1521/XE
+      - SPRING_DATASOURCE_USERNAME=demo
+      - SPRING_DATASOURCE_PASSWORD=demo_password
+      - SPRING_PROFILES_ACTIVE=staging
+      - SERVER_PORT=8080
+    ports:
+      - "8082:8080"
+    depends_on:
+      oracle-db-staging:
+        condition: service_healthy
+    networks:
+      - spring-oracle-staging-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  oracle-staging-data:
+    driver: local
+
+networks:
+  spring-oracle-staging-network:
+    driver: bridge

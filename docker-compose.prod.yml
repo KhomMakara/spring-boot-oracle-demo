@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Oracle Database for Production
+  oracle-db-prod:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: spring-oracle-db-prod
+    environment:
+      - ORACLE_PWD=prod_oracle_secure_password
+      - ORACLE_CHARACTERSET=AL32UTF8
+    ports:
+      - "1523:1521"
+      - "5502:5500"
+    volumes:
+      - oracle-prod-data:/opt/oracle/oradata
+    networks:
+      - spring-oracle-prod-network
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "system/prod_oracle_secure_password@//localhost:1521/XE", "@/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Spring Boot Application for Production
+  spring-oracle-app-prod:
+    image: your-registry.com/spring-oracle:latest
+    container_name: spring-oracle-app-prod
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle-db-prod:1521/XE
+      - SPRING_DATASOURCE_USERNAME=demo
+      - SPRING_DATASOURCE_PASSWORD=demo_password
+      - SPRING_PROFILES_ACTIVE=production
+      - SERVER_PORT=8080
+      - JAVA_OPTS=-Xmx1024m -Xms512m
+    ports:
+      - "8083:8080"
+    depends_on:
+      oracle-db-prod:
+        condition: service_healthy
+    networks:
+      - spring-oracle-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+volumes:
+  oracle-prod-data:
+    driver: local
+
+networks:
+  spring-oracle-prod-network:
+    driver: bridge
